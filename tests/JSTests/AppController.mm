@@ -11,9 +11,6 @@
 #import "js_bindings_core.h"
 #import "js_bindings_basic_conversions.h"
 
-// dlopen
-#include <dlfcn.h>
-
 // SpiderMonkey
 #include "jsapi.h"  
 
@@ -221,8 +218,8 @@
 			}
 			else if (JSVAL_IS_VOID(out) )
 				string = @"Result(void):\n";
-			else if (JSVAL_IS_OBJECT(out) )
-				string = @"Result(object):\n";
+			else
+				string = @"Result(object?):\n";
 		}
 		else
 		{
