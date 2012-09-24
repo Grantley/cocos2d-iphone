@@ -426,97 +426,58 @@ goog.inherits( ChipmunkCollisionMemoryLeakTest, BaseLayer );
 
 //------------------------------------------------------------------
 //
-// Chipmunk Space Test
+// Chipmunk Object Oriented Test
 //
 //------------------------------------------------------------------
 
-cp.Space = function() {
-	this.object = new cp._Space();
-	this.handle = this.object.handle();
-};
-
-cp.Space.prototype.getStaticBody = function() {
-	return cp.spaceGetStaticBody( this.handle );
-};
-
-cp.Space.prototype.addStaticShape = function( shape ) {
-	return cp.spaceAddStaticShape( this.handle, shape );
-};
-
-cp.Space.prototype.addShape = function( shape ) {
-	return cp.spaceAddShape( this.handle, shape );
-};
-
-cp.Space.prototype.addBody = function( body ) {
-	return cp.spaceAddBody( this.handle, body );
-};
-
-cp.Space.prototype.addCollisionHandler = function( typeA, typeB, object, cbBegin, cbPre, cbPost, cbSep ) {
-	return cp.spaceAddCollisionHandler( this.handle, typeA, typeB, object, cbBegin, cbPre, cbPost, cbSep );
-};
-
-cp.Space.prototype.removeCollisionHandler = function( typeA, typeB ) {
-	return cp.spaceRemoveCollisionHandler( this.handle, typeA, typeB );
-};
-
-cp.Space.prototype.getGravity = function() {
-	return cp.spaceGetGravity( this.handle );
-};
-
-cp.Space.prototype.setGravity = function( gravity ) {
-	return cp.spaceSetGravity( this.handle, gravity );
-};
-
-cp.Space.prototype.step = function( dt ) {
-	return cp.spaceStep( this.handle, dt );
-};
-
-var ChipmunkSpaceTest = function() {
+var ChipmunkOOTest = function() {
 
 	goog.base(this);
 
 	this.title = function() {
-		return 'Chipmunk Space Test';
+		return 'Chipmunk OO Test';
 	};
 
 	this.subtitle = function() {
-		return 'Testing Space as object';
+		return 'Testing Object Oriented Chipmunk';
 	};
 
 	// init physics
 	this.initPhysics = function() {
 		this.space =  new cp.Space();
-		var staticBody = this.space.getStaticBody();
+		var staticBody = this.space.staticBody;
 
 		// Walls
-		var walls = [cp.segmentShapeNew( staticBody, cp.v(0,0), cp.v(winSize.width,0), 0 ),				// bottom
-				cp.segmentShapeNew( staticBody, cp.v(0,winSize.height), cp.v(winSize.width,winSize.height), 0),	// top
-				cp.segmentShapeNew( staticBody, cp.v(0,0), cp.v(0,winSize.height), 0),				// left
-				cp.segmentShapeNew( staticBody, cp.v(winSize.width,0), cp.v(winSize.width,winSize.height), 0)	// right
+		var walls = [ new cp.SegmentShape( staticBody, cp.v(0,0), cp.v(winSize.width,0), 0 ),				// bottom
+				new cp.SegmentShape( staticBody, cp.v(0,winSize.height), cp.v(winSize.width,winSize.height), 0),	// top
+				new cp.SegmentShape( staticBody, cp.v(0,0), cp.v(0,winSize.height), 0),				// left
+				new cp.SegmentShape( staticBody, cp.v(winSize.width,0), cp.v(winSize.width,winSize.height), 0)	// right
 				];
 		for( var i=0; i < walls.length; i++ ) {
 			var wall = walls[i];
-			cp.shapeSetElasticity(wall, 1);
-			cp.shapeSetFriction(wall, 1);
+			wall.setElasticity(1);
+			wall.setFriction(1);
 			this.space.addStaticShape( wall );
 		}
 
-		// Gravity
-		this.space.setGravity( cp.v(0, -30) );
+		// Gravity:
+		// testing properties
+		this.space.gravity = cp.v(0,-100);
+		this.space.iterations = 15;
 	};
 
 	this.createPhysicsSprite = function( pos, file, collision_type ) {
-		var body = cp.bodyNew(1, cp.momentForBox(1, 48, 108) );
-		cp.bodySetPos( body, pos );
-		this.space.addBody( body );
-		var shape = cp.boxShapeNew( body, 48, 108);
-		cp.shapeSetElasticity( shape, 0.5 );
-		cp.shapeSetFriction( shape, 0.5 );
-		cp.shapeSetCollisionType( shape, collision_type );
+		var body = new cp.Body(1, cp.momentForBox(1, 48, 108) );
+		body.setPos(pos);
+		this.space.addBody(body);
+		var shape = new cp.BoxShape( body, 48, 108);
+		shape.setElasticity( 0.5 );
+		shape.setFriction( 0.5 );
+		shape.setCollisionType( collision_type );
 		this.space.addShape( shape );
 
 		var sprite = cc.PhysicsSprite.create(file);
-		sprite.setBody( body );
+		sprite.setBody( body.handle );
 		return sprite;
 	};
 
@@ -552,10 +513,10 @@ var ChipmunkSpaceTest = function() {
 			this.messageDisplayed = true;
 		}
 		cc.log('collision begin');
-		var bodies = cp.arbiterGetBodies( arbiter );
-		var shapes = cp.arbiterGetShapes( arbiter );
-		var collTypeA = cp.shapeGetCollisionType( shapes[0] );
-		var collTypeB = cp.shapeGetCollisionType( shapes[1] );
+		// var bodies = arbiter.getBodies();
+		var shapes = arbiter.getShapes();
+		var collTypeA = shapes[0].getCollisionType();
+		var collTypeB = shapes[1].getCollisionType();
 		cc.log( 'Collision Type A:' + collTypeA );
 		cc.log( 'Collision Type B:' + collTypeB );
 		return true;
@@ -575,16 +536,17 @@ var ChipmunkSpaceTest = function() {
 	};
 
 };
-goog.inherits( ChipmunkSpaceTest, BaseLayer );
+goog.inherits( ChipmunkOOTest, BaseLayer );
 
 //
 // Order of tests
 //
+scenes.push( ChipmunkOOTest );
 
 scenes.push( ChipmunkSpriteTest ); scenes.push( ChipmunkSpriteBatchTest );
 scenes.push( ChipmunkCollisionTest );
 scenes.push( ChipmunkCollisionMemoryLeakTest );
-scenes.push( ChipmunkSpaceTest );
+scenes.push( ChipmunkOOTest );
 
 //------------------------------------------------------------------
 //

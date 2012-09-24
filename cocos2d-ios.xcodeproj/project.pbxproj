@@ -1822,6 +1822,9 @@
 		A0600CE413C2757D00BB6F49 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		A0601FD01534B2F600C4EECA /* bugs in Resources */ = {isa = PBXBuildFile; fileRef = 50CBA4A711CBD7FB007B009D /* bugs */; };
 		A0601FD21534B31F00C4EECA /* only_in_hd-hd.pvr.ccz in Resources */ = {isa = PBXBuildFile; fileRef = A0B035FA13EA09270073E59A /* only_in_hd-hd.pvr.ccz */; };
+		A062CA87160D453200D1E3BC /* js_bindings_chipmunk_auto_classes_registration.h in Headers */ = {isa = PBXBuildFile; fileRef = A062CA84160D453200D1E3BC /* js_bindings_chipmunk_auto_classes_registration.h */; };
+		A062CA88160D453200D1E3BC /* js_bindings_chipmunk_auto_classes.h in Headers */ = {isa = PBXBuildFile; fileRef = A062CA85160D453200D1E3BC /* js_bindings_chipmunk_auto_classes.h */; };
+		A062CA89160D453200D1E3BC /* js_bindings_chipmunk_auto_classes.mm in Sources */ = {isa = PBXBuildFile; fileRef = A062CA86160D453200D1E3BC /* js_bindings_chipmunk_auto_classes.mm */; };
 		A07273C0155B1F07003E961F /* test_1021x1024.png in Resources */ = {isa = PBXBuildFile; fileRef = A07273BC155B1F07003E961F /* test_1021x1024.png */; };
 		A07273C7155B217E003E961F /* test_1021x1024_a8.pvr.gz in Resources */ = {isa = PBXBuildFile; fileRef = A07273C3155B217C003E961F /* test_1021x1024_a8.pvr.gz */; };
 		A07273C8155B217E003E961F /* test_1021x1024_rgb888.pvr.gz in Resources */ = {isa = PBXBuildFile; fileRef = A07273C4155B217C003E961F /* test_1021x1024_rgb888.pvr.gz */; };
@@ -5624,6 +5627,9 @@
 		A05B5B09156F35C100ADAB65 /* cpVect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpVect.c; sourceTree = "<group>"; };
 		A05B5B0A156F35C100ADAB65 /* prime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prime.h; sourceTree = "<group>"; };
 		A060106813C2992800BB6F49 /* LICENSE_Kazmath.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_Kazmath.txt; sourceTree = "<group>"; };
+		A062CA84160D453200D1E3BC /* js_bindings_chipmunk_auto_classes_registration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = js_bindings_chipmunk_auto_classes_registration.h; sourceTree = "<group>"; };
+		A062CA85160D453200D1E3BC /* js_bindings_chipmunk_auto_classes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = js_bindings_chipmunk_auto_classes.h; sourceTree = "<group>"; };
+		A062CA86160D453200D1E3BC /* js_bindings_chipmunk_auto_classes.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = js_bindings_chipmunk_auto_classes.mm; sourceTree = "<group>"; };
 		A0707F6215F946E9001C1263 /* LICENSE_CCBReader.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE_CCBReader.txt; sourceTree = "<group>"; };
 		A0707F6315F946E9001C1263 /* LICENSE_JRSwizzle.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE_JRSwizzle.txt; sourceTree = "<group>"; };
 		A0707F6415F946E9001C1263 /* LICENSE_jsbindings.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE_jsbindings.txt; sourceTree = "<group>"; };
@@ -8509,6 +8515,9 @@
 		A031BF3715DAC68600E1986C /* auto */ = {
 			isa = PBXGroup;
 			children = (
+				A062CA84160D453200D1E3BC /* js_bindings_chipmunk_auto_classes_registration.h */,
+				A062CA85160D453200D1E3BC /* js_bindings_chipmunk_auto_classes.h */,
+				A062CA86160D453200D1E3BC /* js_bindings_chipmunk_auto_classes.mm */,
 				A031BF3815DAC68600E1986C /* js_bindings_chipmunk_functions.h */,
 				A031BF3915DAC68600E1986C /* js_bindings_chipmunk_functions.mm */,
 				A031BF3A15DAC68600E1986C /* js_bindings_chipmunk_functions_registration.h */,
@@ -9684,6 +9693,8 @@
 				A03E21CD15F9626500E58C9D /* ThreadLocal.h in Headers */,
 				A03E21CE15F9626500E58C9D /* Types.h in Headers */,
 				A03E21CF15F9626500E58C9D /* Util.h in Headers */,
+				A062CA87160D453200D1E3BC /* js_bindings_chipmunk_auto_classes_registration.h in Headers */,
+				A062CA88160D453200D1E3BC /* js_bindings_chipmunk_auto_classes.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14838,6 +14849,7 @@
 				A0C70B6015E3140800CD8896 /* CCNode.m in Sources */,
 				A0C70B6115E3140800CD8896 /* CCNode+Debug.m in Sources */,
 				A0C70B6215E3140800CD8896 /* CCAtlasNode.m in Sources */,
+				A062CA89160D453200D1E3BC /* js_bindings_chipmunk_auto_classes.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
