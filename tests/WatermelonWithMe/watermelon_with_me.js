@@ -328,11 +328,8 @@ var GameLayer = cc.LayerGradient.extend({
     },
 
     onMainMenu:function(sender) {
-        var scene = cc.Scene.create();
-        var layer = new MenuLayer();
-        scene.addChild( layer );
-        director.replaceScene( cc.TransitionProgressRadialCCW.create(1, scene) );
-        this._state = STATE_PAUSE;
+        var scene = cc.Reader.loadAsScene("MainMenu.ccbi");
+        director.replaceScene( scene );
     },
 
     onToggleDebug:function(sender) {
@@ -610,9 +607,9 @@ var GameLayer = cc.LayerGradient.extend({
     },
 
     createCar : function(pos) {
-        var front = this.createWheel( cp.vadd(pos, cp._v(47,-25) ) );
-        this._chassis = this.createChassis( cp.vadd( pos, COG_ADJUSTMENT ) );
-        this._rearWheel = this.createWheel( cp.vadd( pos, cp._v(-35, -25) ) );
+        var front = this.createWheel( cp.v.add(pos, cp._v(47,-25) ) );
+        this._chassis = this.createChassis( cp.v.add( pos, COG_ADJUSTMENT ) );
+        this._rearWheel = this.createWheel( cp.v.add( pos, cp._v(-35, -25) ) );
         this.createCarJoints( this._chassis, front, this._rearWheel );
         this.createCarFruits( pos );
 
@@ -624,7 +621,7 @@ var GameLayer = cc.LayerGradient.extend({
         // The front wheel strut telescopes, so we'll attach the center of the wheel to a groov joint on the chassis.
         // I created the graphics specifically to have a 45 degree angle. So it's easy to just fudge the numbers.
         var grv_a = chassis.world2Local( front.getPos() );
-        var grv_b = cp.vadd( grv_a, cp.vmult( cp._v(-1, 1), 7 ) );
+        var grv_b = cp.v.add( grv_a, cp.v.mult( cp._v(-1, 1), 7 ) );
         var frontJoint = new cp.GrooveJoint( chassis, front, grv_a, grv_b, cp.vzero );
 
         // Create the front zero-length spring.
@@ -633,10 +630,10 @@ var GameLayer = cc.LayerGradient.extend({
 
         // The rear strut is a swinging arm that holds the wheel a at a certain distance from a pivot on the chassis.
         // A perfect fit for a pin joint conected between the chassis and the wheel's center.
-        var rearJoint = new cp.PinJoint( chassis, rear, cp.vsub( cp._v(-14,-8), COG_ADJUSTMENT), cp.vzero );
+        var rearJoint = new cp.PinJoint( chassis, rear, cp.v.sub( cp._v(-14,-8), COG_ADJUSTMENT), cp.vzero );
         
         // return cpvtoangle(cpvsub([_chassis.body local2world:_rearJoint.anchr1], _rearWheel.body.pos));
-        var rearStrutRestAngle = cp.vtoangle( cp.vsub(
+        var rearStrutRestAngle = cp.v.toangle( cp.v.sub(
                                                 chassis.local2World( rearJoint.getAnchr1() ),
                                                 rear.getPos() ) );
 
@@ -701,7 +698,7 @@ var GameLayer = cc.LayerGradient.extend({
 
     createChassis : function(pos) {
         var sprite = cc.PhysicsSprite.createWithSpriteFrameName("Chassis.png");
-        var anchor = cp.vadd( sprite.getAnchorPointInPoints(), COG_ADJUSTMENT );
+        var anchor = cp.v.add( sprite.getAnchorPointInPoints(), COG_ADJUSTMENT );
         var cs = sprite.getContentSize();
         sprite.setAnchorPoint( cc.p(anchor.x / cs.width, anchor.y/cs.height) );
 
@@ -726,7 +723,7 @@ var GameLayer = cc.LayerGradient.extend({
         this._space.addShape( shape );
 
         // box for fruits (left)
-        shape = new cp.BoxShape2( body, {l:-50, b:0, r:-46, t:30} );
+        shape = new cp.BoxShape2( body, cp.bb(-50, 0, -46, 30) );
 		shape.setFriction(0.3);
 		shape.setGroup( GROUP_BUGGY );
 		shape.setLayers( COLLISION_LAYERS_BUGGY );
@@ -734,7 +731,7 @@ var GameLayer = cc.LayerGradient.extend({
         this._space.addShape( shape );
 
         // box for fruits (right)
-        shape = new cp.BoxShape2( body, {l:8, b:0, r:12, t:30} );
+        shape = new cp.BoxShape2( body, cp.bb(8, 0, 12, 30) );
 		shape.setFriction(0.3);
 		shape.setGroup( GROUP_BUGGY );
 		shape.setLayers( COLLISION_LAYERS_BUGGY );
@@ -920,20 +917,23 @@ var GameLayer = cc.LayerGradient.extend({
     // Helpers
     //
     enableEvents:function(enabled) {
-        var platform = __getPlatform();
-        if( platform.substring(0,7) == 'desktop' ) {
-            this.setMouseEnabled( enabled );
-        } else if( platform.substring(0,6) == 'mobile' ) {
-            this.setTouchEnabled( enabled );
+        var t = cc.config.deviceType;
+        if( t == 'browser' )  {
+            // this.setTouchEnabled(true);
+            // this.setKeyboardEnabled(true);
+        } else if( t == 'desktop' ) {
+            this.setMouseEnabled(true);
+        } else if( t == 'mobile' ) {
+            this.setTouchEnabled(true);
         }
     },
 
     enableCollisionEvents:function(enabled) {
         if( enabled ) {
             // collision handler
-            this._space.addCollisionHandler( COLLISION_TYPE_CAR, COLLISION_TYPE_COIN, this, this.onCollisionBeginCoin, null, null, null );
-            this._space.addCollisionHandler( COLLISION_TYPE_CAR, COLLISION_TYPE_FINISH, this, this.onCollisionBeginFinish, null, null, null );
-            this._space.addCollisionHandler( COLLISION_TYPE_FLOOR, COLLISION_TYPE_WATERMELON, this, this.onCollisionBeginWatermelon, null, null, null );
+            this._space.addCollisionHandler( COLLISION_TYPE_CAR, COLLISION_TYPE_COIN, this.onCollisionBeginCoin.bind(this), null, null, null );
+            this._space.addCollisionHandler( COLLISION_TYPE_CAR, COLLISION_TYPE_FINISH, this.onCollisionBeginFinish.bind(this), null, null, null );
+            this._space.addCollisionHandler( COLLISION_TYPE_FLOOR, COLLISION_TYPE_WATERMELON, this.onCollisionBeginWatermelon.bind(this), null, null, null );
         } else {
             this._space.removeCollisionHandler( COLLISION_TYPE_FLOOR, COLLISION_TYPE_WATERMELON );
             this._space.removeCollisionHandler( COLLISION_TYPE_COIN, COLLISION_TYPE_CAR );
@@ -966,9 +966,7 @@ var BootLayer = cc.Layer.extend({
     },
     
     onEnter:function() {
-        var scene = cc.Scene.create();
-        var layer = new MenuLayer();
-        scene.addChild( layer );
+        var scene = cc.Reader.loadAsScene("MainMenu.ccbi");
         director.replaceScene( scene );
     }
 });
@@ -976,84 +974,71 @@ var BootLayer = cc.Layer.extend({
 //
 // Main Menu
 //
-var MenuLayer = cc.Layer.extend({
 
-    ctor:function () {
-                                
-        var parent = new cc.Layer();
-        __associateObjWithNative(this, parent);
-        this.init();
+// 'MenuLayerController' class is instantiated by CocosBuilder Reader
+var MenuLayerController = function() {};
 
-        // background
-        var node = cc.Reader.load("MainMenu.ccbi", this, winSize);
-        this.addChild( node );
-        var label = node.getChildByTag( TITLE_TAG );
-        var o = label.getChildByTag( 8 );
+// callback triggered by CCB Reader once the instance is created
+MenuLayerController.prototype.onDidLoadFromCCB = function()
+{
+    // Spin the 'o' in the title
+    var o = this.titleLabel.getChildByTag( 8 );
+    
+    var a_delay = cc.DelayTime.create(6);
+    var a_tint = cc.TintTo.create( 0.5, 0, 255, 0 );
+    var a_rotate = cc.RotateBy.create( 4, 360 );
+    var a_rep = cc.Repeat.create( a_rotate, 1000 );
+    var a_seq = cc.Sequence.create( a_delay, a_tint, a_delay.copy(), a_rep );
+    o.runAction( a_seq );
+};
 
-        var a_delay = cc.DelayTime.create(6);
-        var a_tint = cc.TintTo.create( 0.5, 0, 255, 0 );
-        var a_rotate = cc.RotateBy.create( 4, 360 );
-        var a_rep = cc.Repeat.create( a_rotate, 1000 );
-        var a_seq = cc.Sequence.create( a_delay, a_tint, a_delay.copy(), a_rep );
-        o.runAction( a_seq );
+// callbacks for the menu, defined in the editor
+MenuLayerController.prototype.onPlay = function()
+{
+    var scene = cc.Scene.create();
+    var layer = new GameLayer(0);
+    scene.addChild( layer );
+    director.replaceScene( cc.TransitionFade.create(1, scene) );
+};
 
-        __jsc__.dumpRoot();
-        __jsc__.garbageCollect();
-    },
+MenuLayerController.prototype.onOptions = function()
+{
+    var scene = cc.Scene.create();
+    var layer = new OptionsLayer();
+    scene.addChild( layer );
+    director.replaceScene( cc.TransitionFlipY.create(1, scene) );
+};
 
-    onPlay:function( sender) {
-        var scene = cc.Scene.create();
-        var layer = new GameLayer(0);
-        scene.addChild( layer );
-        director.replaceScene( cc.TransitionFade.create(1, scene) );
-    },
-
-    onOptions:function( sender) {
-        var scene = cc.Scene.create();
-        var layer = new OptionsLayer();
-        scene.addChild( layer );
-        director.replaceScene( cc.TransitionFlipY.create(1, scene) );
-    },
-
-    onAbout:function( sender ) {
-        var scene = cc.Scene.create();
-        var layer = new AboutLayer();
-        scene.addChild( layer );
-        director.replaceScene( cc.TransitionZoomFlipY.create(1, scene) );
-    }
-});
+MenuLayerController.prototype.onAbout = function()
+{
+    /*var scene = cc.Scene.create();
+    var layer = new AboutLayer();
+    scene.addChild( layer );*/
+    var scene = cc.Reader.loadAsScene("About.ccbi");
+    director.replaceScene( cc.TransitionZoomFlipY.create(1, scene) );
+};
 
 //
 // About
 //
-var AboutLayer = cc.Layer.extend({
+var AboutLayerController = function() {};
 
-    ctor:function () {
-        var parent = new cc.LayerGradient();
-        __associateObjWithNative(this, parent);
-        this.init();
+AboutLayerController.prototype.onDidLoadFromCCB = function()
+{
+    var back = cc.MenuItemFont.create("Back", this, this.onBack );
+    back.setColor( cc.BLACK );
+    var menu = cc.Menu.create( back );
+    this.rootNode.addChild( menu );
+    menu.zOrder = 100;
+    menu.alignItemsVertically();
+    menu.setPosition( cc._p( winSize.width - 50, 50) );
+};
 
-        var about = cc.Reader.load("About.ccbi", this);
-        this.addChild( about );
-
-        var back = cc.MenuItemFont.create("Back", this, this.onBack );
-        back.setColor( cc.BLACK );
-        var menu = cc.Menu.create( back );
-        this.addChild( menu );
-        menu.alignItemsVertically();
-        menu.setPosition( cc._p( winSize.width - 50, 50) );
-
-        __jsc__.dumpRoot();
-        __jsc__.garbageCollect();
-    },
-
-    onBack:function( sender) {
-        var scene = cc.Scene.create();
-        var layer = new MenuLayer();
-        scene.addChild( layer );
-        director.replaceScene( cc.TransitionFlipX.create(1, scene) );
-    }
-});
+AboutLayerController.prototype.onBack = function()
+{
+    var scene = cc.Reader.loadAsScene("MainMenu.ccbi");
+    director.replaceScene( scene );
+};
 
 //
 // Options
@@ -1083,10 +1068,8 @@ var OptionsLayer = cc.LayerGradient.extend({
     },
 
     onBack:function( sender) {
-        var scene = cc.Scene.create();
-        var layer = new MenuLayer();
-        scene.addChild( layer );
-        director.replaceScene( cc.TransitionFlipX.create(1, scene) );
+        var scene = cc.Reader.loadAsScene("MainMenu.ccbi");
+        director.replaceScene( scene );
     },
 
     onMusicToggle:function( sender ) {
